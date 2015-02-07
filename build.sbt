@@ -60,15 +60,18 @@ lazy val sharedSettings = mimaDefaultSettings ++ Seq(
   }
 )
 
-lazy val js = project.in(file("js"))
-  .settings(sharedSettings: _*)
-  .settings(
-    libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
-  )
-  .enablePlugins(ScalaJSPlugin)
+lazy val root = project.in(file("."))
+  .aggregate(js, jvm)
 
-lazy val jvm = project.in(file("jvm"))
+lazy val scalacheck = crossProject.in(file("."))
   .settings(sharedSettings: _*)
-  .settings(
+  .jsSettings(
+    libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+  ).jvmSettings(
     libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0"
   )
+
+lazy val js = scalacheck.js
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val jvm = scalacheck.jvm
